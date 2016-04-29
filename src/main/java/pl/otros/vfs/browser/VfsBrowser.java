@@ -387,7 +387,7 @@ public class VfsBrowser extends JPanel {
 
     tableFiles.setDefaultRenderer(FileSize.class, new FileSizeTableCellRenderer());
     tableFiles.setDefaultRenderer(FileNameWithType.class, new FileNameWithTypeTableCellRenderer());
-    tableFiles.setDefaultRenderer(Date.class, new MixedDateTableCellRenderer());
+    tableFiles.setDefaultRenderer(Date.class, new DateTableCellRenderer());
     tableFiles.setDefaultRenderer(FileType.class, new FileTypeTableCellRenderer());
 
     tableFiles.getSelectionModel().addListSelectionListener(new PreviewListener(this, previewComponent));

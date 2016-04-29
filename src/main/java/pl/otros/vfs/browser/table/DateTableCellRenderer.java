@@ -25,7 +25,7 @@ import java.util.Date;
 
 public class DateTableCellRenderer extends DefaultTableCellRenderer {
 
-  private DateFormat dateFormatFull = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+  private DateFormat dateFormatFull = new SimpleDateFormat("yyyy-MM-dd HH:mm");
   private DateFormat dateFormatHourOnly = new SimpleDateFormat("HH:mm:ss");
   private DateFormat dateOnly = new SimpleDateFormat("yyyy-MM-dd");
 
@@ -36,11 +36,7 @@ public class DateTableCellRenderer extends DefaultTableCellRenderer {
     String s = "-";
     if (d != null) {
       s = d.toString();
-      DateFormat df = dateOnly;
-      if (dateOnly.format(d).equals(dateOnly.format(new Date()))) {
-        df = dateFormatHourOnly;
-        l.setToolTipText(dateFormatFull.format(d));
-      }
+      DateFormat df = dateFormatFull;
       l.setToolTipText(dateFormatFull.format(d));
       s = df.format(d);
 

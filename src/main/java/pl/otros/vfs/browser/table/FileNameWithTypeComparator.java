@@ -16,6 +16,7 @@
 
 package pl.otros.vfs.browser.table;
 
+import org.apache.commons.vfs2.FileName;
 import pl.otros.vfs.browser.ParentFileObject;
 import org.apache.commons.vfs2.FileType;
 
@@ -52,12 +53,63 @@ public class FileNameWithTypeComparator implements Comparator<FileNameWithType> 
     } else if (!folder1 & folder2) {
       result = 1 * sortOrderSign;
     } else {
+      FileName file1 = o1.getFileName();
+      FileName file2 = o2.getFileName();
+
+      String[] split1 = file1.toString().split("\\.");
+      String[] split2 = file2.toString().split("\\.");
+
+      for (int i = 0; i < split1.length; i++) {
+        String s1 = split1[i];
+
+        if(split2.length>i){
+          String s2 = split2[i];
+          if(s1.equals(s2)){
+            continue;
+          }
+
+          if(isNumber(s1, 10) && isNumber(s2, 10)){
+            long i1 = Long.valueOf(s1);
+            long i2 = Long.valueOf(s2);
+
+            return Long.compare(i1,i2);
+          }
+          else {
+            return s1.compareTo(s2);
+          }
+
+        }
+        else{
+          if(i>0) {
+            return split1[i - 1].compareTo(split2[i - 1]);
+          }
+          else{
+            break;
+          }
+        }
+      }
+
+
       result = o1.getFileName().compareTo(o2.getFileName());
     }
+    //sftp://dsimon@vpapptest01.fs.gk-software.com/var/log/valuephone
 
     return result;
   }
 
+
+  public static boolean isNumber(String s, int radix) {
+    if(s.isEmpty()) return false;
+    for(int i = 0; i < s.length(); i++) {
+      if(i == 0 && s.charAt(i) == '-') {
+        if(s.length() == 1) return false;
+        else continue;
+      }
+      if(Character.digit(s.charAt(i),radix) < 0) return false;
+    }
+
+    return true;
+  }
 
   public void setSortOrder(SortOrder sortOrder) {
     this.sortOrder = sortOrder;
