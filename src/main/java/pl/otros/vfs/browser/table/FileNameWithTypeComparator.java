@@ -38,7 +38,7 @@ public class FileNameWithTypeComparator implements Comparator<FileNameWithType> 
     if (o2 == null || o2.getFileType() == null || o2.getFileName() == null) {
       return 1;
     }
-    //folders first first
+    //folders first
     boolean folder1 = FileType.FOLDER.equals(o1.getFileType());
     boolean folder2 = FileType.FOLDER.equals(o2.getFileType());
     int result = 0;
@@ -59,6 +59,9 @@ public class FileNameWithTypeComparator implements Comparator<FileNameWithType> 
       String[] split1 = file1.toString().split("\\.");
       String[] split2 = file2.toString().split("\\.");
 
+      int file1Counter=0;
+      int file2Counter=0;
+
       for (int i = 0; i < split1.length; i++) {
         String s1 = split1[i];
 
@@ -72,21 +75,23 @@ public class FileNameWithTypeComparator implements Comparator<FileNameWithType> 
             long i1 = Long.valueOf(s1);
             long i2 = Long.valueOf(s2);
 
-            return Long.compare(i1,i2);
+            int compare = Long.compare(i1, i2);
+            file1Counter+=compare;
+            file2Counter-=compare;
           }
           else {
-            return s1.compareTo(s2);
+            int compare = s1.compareTo(s2);
+            file1Counter+=compare;
+            file2Counter-=compare;
           }
 
         }
         else{
-          if(i>0) {
-            return split1[i - 1].compareTo(split2[i - 1]);
-          }
-          else{
             break;
-          }
         }
+      }
+      if(file1Counter!=file2Counter){
+        return Integer.compare(file1Counter,file2Counter);
       }
 
 
