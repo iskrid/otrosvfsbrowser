@@ -17,106 +17,81 @@
 package pl.otros.vfs.browser.table;
 
 import org.apache.commons.vfs2.FileName;
-import pl.otros.vfs.browser.ParentFileObject;
 import org.apache.commons.vfs2.FileType;
+import pl.otros.vfs.browser.ParentFileObject;
 
 import javax.swing.*;
 import java.util.Comparator;
 
 public class FileNameWithTypeComparator implements Comparator<FileNameWithType> {
-  private SortOrder sortOrder = SortOrder.ASCENDING;
+    private SortOrder sortOrder = SortOrder.ASCENDING;
 
-  @Override
-  public int compare(FileNameWithType o1, FileNameWithType o2) {
-    return compareTo(o1, o2);
-  }
-
-  public int compareTo(FileNameWithType o1, FileNameWithType o2) {
-    if (o1 == null || o1.getFileType() == null || o1.getFileName() == null) {
-      return -1;
+    @Override public int compare(FileNameWithType o1, FileNameWithType o2) {
+        return compareTo(o1, o2);
     }
-    if (o2 == null || o2.getFileType() == null || o2.getFileName() == null) {
-      return 1;
-    }
-    //folders first
-    boolean folder1 = FileType.FOLDER.equals(o1.getFileType());
-    boolean folder2 = FileType.FOLDER.equals(o2.getFileType());
-    int result = 0;
 
-    int sortOrderSign = SortOrder.ASCENDING.equals(sortOrder) ? 1 : -1;
-    if (o1.getFileName().getBaseName().equalsIgnoreCase(ParentFileObject.PARENT_NAME)) {
-      result = -1 * sortOrderSign;
-    } else if (o2.getFileName().getBaseName().equalsIgnoreCase(ParentFileObject.PARENT_NAME)) {
-      result = 1 * sortOrderSign;
-    } else if (folder1 & !folder2) {
-      result = -1 * sortOrderSign;
-    } else if (!folder1 & folder2) {
-      result = 1 * sortOrderSign;
-    } else {
-      FileName file1 = o1.getFileName();
-      FileName file2 = o2.getFileName();
+    public int compareTo(FileNameWithType o1, FileNameWithType o2) {
 
-      String[] split1 = file1.toString().split("\\.");
-      String[] split2 = file2.toString().split("\\.");
-
-      int file1Counter=0;
-      int file2Counter=0;
-
-      for (int i = 0; i < split1.length; i++) {
-        String s1 = split1[i];
-
-        if(split2.length>i){
-          String s2 = split2[i];
-          if(s1.equals(s2)){
-            continue;
-          }
-
-          if(isNumber(s1, 10) && isNumber(s2, 10)){
-            long i1 = Long.valueOf(s1);
-            long i2 = Long.valueOf(s2);
-
-            int compare = Long.compare(i1, i2);
-            file1Counter+=compare;
-            file2Counter-=compare;
-          }
-          else {
-            int compare = s1.compareTo(s2);
-            file1Counter+=compare;
-            file2Counter-=compare;
-          }
-
+        if (o1 == null || o1.getFileType() == null || o1.getFileName() == null) {
+            return -1;
         }
-        else{
-            break;
+        if (o2 == null || o2.getFileType() == null || o2.getFileName() == null) {
+            return 1;
         }
-      }
-      if(file1Counter!=file2Counter){
-        return Integer.compare(file1Counter,file2Counter);
-      }
+        //folders first
+        boolean folder1 = FileType.FOLDER.equals(o1.getFileType());
+        boolean folder2 = FileType.FOLDER.equals(o2.getFileType());
+        int result = 0;
 
+        int sortOrderSign = SortOrder.ASCENDING.equals(sortOrder) ? 1 : -1;
+        if (o1.getFileName().getBaseName().equalsIgnoreCase(ParentFileObject.PARENT_NAME)) {
+            result += (-1 * sortOrderSign);
+        } else if (o2.getFileName().getBaseName().equalsIgnoreCase(ParentFileObject.PARENT_NAME)) {
+            result += (1 * sortOrderSign);
+        } else if (folder1 && !folder2) {
+            result += (-1 * sortOrderSign);
+        } else if (!folder1 && folder2) {
+            result += (1 * sortOrderSign);
+        } else
+        {
+            AlphanumComparator alphanumComparator = new AlphanumComparator();
+            result = alphanumComparator.compare(o1.getFileName().getBaseName(), o2.getFileName().getBaseName());
+        }
 
-      result = o1.getFileName().compareTo(o2.getFileName());
+//        else{
+//            result = o1.getFileName().compareTo(o2.getFileName());
+//        }
+
+        System.out.println(o1.getFileName()+"-"+o2.getFileName()+"  "+result);
+
+        if(result>0){
+            result=1;
+        }
+        else if(result<0){
+            result = -1;
+        }
+
+        return result;
     }
-    //sftp://dsimon@vpapptest01.fs.gk-software.com/var/log/valuephone
 
-    return result;
-  }
+    public static boolean isNumber(String s, int radix) {
+        if (s.isEmpty())
+            return false;
+        for (int i = 0; i < s.length(); i++) {
+            if (i == 0 && s.charAt(i) == '-') {
+                if (s.length() == 1)
+                    return false;
+                else
+                    continue;
+            }
+            if (Character.digit(s.charAt(i), radix) < 0)
+                return false;
+        }
 
-
-  public static boolean isNumber(String s, int radix) {
-    if(s.isEmpty()) return false;
-    for(int i = 0; i < s.length(); i++) {
-      if(i == 0 && s.charAt(i) == '-') {
-        if(s.length() == 1) return false;
-        else continue;
-      }
-      if(Character.digit(s.charAt(i),radix) < 0) return false;
+        return true;
     }
 
-    return true;
-  }
-
-  public void setSortOrder(SortOrder sortOrder) {
-    this.sortOrder = sortOrder;
-  }
+    public void setSortOrder(SortOrder sortOrder) {
+        this.sortOrder = sortOrder;
+    }
 }
